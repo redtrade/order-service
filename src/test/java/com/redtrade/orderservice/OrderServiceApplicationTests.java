@@ -1,4 +1,4 @@
-package com.redtrade.services.orderservice;
+package com.redtrade.orderservice;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
