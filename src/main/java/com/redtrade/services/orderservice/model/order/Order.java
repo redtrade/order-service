@@ -1,12 +1,10 @@
 package com.redtrade.services.orderservice.model.order;
 
-import com.redtrade.services.orderservice.model.account.Account;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 
 @Data
-@NoArgsConstructor
-public abstract class Order {
+public class Order {
 
   public enum OrderStatus {
     PENDING, COMPLETED, REJECTED
@@ -16,18 +14,12 @@ public abstract class Order {
     BUY, SELL
   }
 
+  @Id
   private String id;
 
-  private Account account;
-
-  private String symbol;
-  private Double quantity;
+  private String holdingId;
+  private Double amount;
   private OrderStatus status;
+  private OrderAction action;
 
-  public Order(final Account account, final String symbol, final Double quantity) {
-    this.account = account;
-    this.symbol = symbol;
-    this.quantity = quantity;
-    this.status = OrderStatus.PENDING;
-  }
 }

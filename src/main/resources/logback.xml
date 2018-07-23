@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <appender name="stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+    <destination>logstash:4500</destination>
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+    <keepAliveDuration>5 seconds</keepAliveDuration>
+  </appender>
+  <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%-5relative %-5level %logger{35} - %msg%n</pattern>
+    </encoder>
+  </appender>
+  <root level="DEBUG">
+    <appender-ref ref="stash" />
+  </root>
+  <!--<root level="info">-->
+    <!--<appender-ref ref="stdout" />-->
+  <!--</root>-->
+</configuration>

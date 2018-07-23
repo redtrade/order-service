@@ -1,0 +1,41 @@
+package com.redtrade.services.orderservice.embedded;
+
+import de.flapdoodle.embed.mongo.MongodExecutable;
+import de.flapdoodle.embed.mongo.MongodStarter;
+import de.flapdoodle.embed.mongo.config.IMongodConfig;
+import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
+import de.flapdoodle.embed.mongo.config.Net;
+import de.flapdoodle.embed.mongo.distribution.Version;
+import de.flapdoodle.embed.process.runtime.Network;
+import java.io.IOException;
+
+public class EmbeddedMongo {
+
+  private MongodStarter starter = MongodStarter.getDefaultInstance();
+
+  private final String bindIp = "localhost";
+  private final int port = 27017;
+
+  private IMongodConfig mongodConfig;
+
+  private MongodExecutable mongodExecutable;
+
+
+  public EmbeddedMongo() {
+  }
+
+  public void start() throws IOException {
+    mongodConfig = new MongodConfigBuilder()
+        .version(Version.Main.PRODUCTION)
+        .net(new Net(bindIp, port, Network.localhostIsIPv6()))
+        .build();
+    mongodExecutable = starter.prepare(mongodConfig);
+    mongodExecutable.start();
+  }
+
+  public void stop() {
+    if (mongodExecutable != null) {
+      mongodExecutable.stop();
+    }
+  }
+}

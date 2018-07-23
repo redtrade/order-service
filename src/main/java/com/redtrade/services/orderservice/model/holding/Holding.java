@@ -1,16 +1,15 @@
 package com.redtrade.services.orderservice.model.holding;
 
-import com.redtrade.services.orderservice.model.account.Account;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 
 @Data
-@NoArgsConstructor
 public class Holding {
 
+  @Id
   private String id;
 
-  private Account account;
+  private String accountId;
 
   private String symbol;
   private Double quantity;

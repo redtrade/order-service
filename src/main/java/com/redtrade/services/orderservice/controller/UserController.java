@@ -1,8 +1,11 @@
 package com.redtrade.services.orderservice.controller;
 
+import com.redtrade.services.orderservice.model.account.Account;
 import com.redtrade.services.orderservice.model.user.User;
-import com.redtrade.services.orderservice.service.IUserService;
+import com.redtrade.services.orderservice.repository.IAccountRepository;
+import com.redtrade.services.orderservice.repository.IUserRepository;
 import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,27 +18,60 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
   @Autowired
-  private IUserService userService;
+  private IUserRepository userRepository;
 
-  @RequestMapping(path = "/all", method = RequestMethod.GET)
-  private ResponseEntity<List<User>> allUsers() {
-    return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
+  @Autowired
+  private IAccountRepository accountRepository;
+
+  @RequestMapping(path = "/", method = RequestMethod.GET)
+  private ResponseEntity<List<User>> retrieveAllUsers() {
+    return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
   }
 
-  @RequestMapping(path = "/create", method = RequestMethod.POST, consumes = "application/json")
+  @RequestMapping(path = "/", method = RequestMethod.POST, consumes = "application/json")
   private ResponseEntity<User> createUser(@RequestBody User user) {
-    return new ResponseEntity<>(userService.save(new User(user.getEmail())), HttpStatus.OK);
+    LOGGER.info("User created");
+    User newUser = new User();
+    if (user.getEmail().length() > 0) {
+      newUser.setEmail(user.getEmail());
+      User returnUser = userRepository.save(newUser);
+      return new ResponseEntity<>(returnUser, HttpStatus.OK);
+    } else {
+      return new ResponseEntity<>(user, HttpStatus.BAD_REQUEST);
+    }
   }
 
-  @RequestMapping(path = "/remove/{id}", method = RequestMethod.DELETE)
-  private ResponseEntity removeUser(@PathVariable("id") String id) {
-    userService.deleteById(id);
-    return new ResponseEntity(HttpStatus.OK);
+  @RequestMapping(path = "/{id}", method = RequestMethod.GET)
+  private ResponseEntity<Optional<User>> retrieveUser(@PathVariable String id) {
+    return new ResponseEntity<>(userRepository.findById(id), HttpStatus.OK);
   }
+
+  @RequestMapping(path = "/{id}/accounts/", method = RequestMethod.GET)
+  private ResponseEntity<List<Account>> retrieveAccounts(@PathVariable String id) {
+    return new ResponseEntity<>(accountRepository.findByUserId(id), HttpStatus.OK);
+  }
+
+  @RequestMapping(path = "/{id}/accounts/", method = RequestMethod.POST)
+  private ResponseEntity<Account> createAccount(@PathVariable String id,
+      @RequestBody Account account) {
+    Optional<User> user = userRepository.findById(id);
+    if (user.isPresent()) {
+      account.setUserId(user.get().getId());
+      return new ResponseEntity<>(accountRepository.save(account), HttpStatus.OK);
+    } else {
+      return new ResponseEntity<>(account, HttpStatus.BAD_REQUEST);
+    }
+
+  }
+
+//  private ResponseEntity removeUser(@PathVariable("id") String id) {
+//    userService.deleteById(id);
+//    return new ResponseEntity(HttpStatus.OK);
+//  }
 }
